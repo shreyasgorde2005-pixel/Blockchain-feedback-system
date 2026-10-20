@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Admin dashboard · Blockchain Feedback{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <h1>Admin dashboard</h1>
+  <p>Overview of student feedback and blockchain integrity.</p>
+</div>
+<div class="stats-grid">
+  <div class="stat-card"><span>Total feedback</span><strong>{{ total_feedback }}</strong></div>
+  <div class="stat-card"><span>Student accounts</span><strong>{{ total_students }}</strong></div>
+  <div class="stat-card"><span>Average rating</span><strong>{{ avg_rating if avg_rating is not none else '—' }}{% if avg_rating is not none %}/5{% endif %}</strong></div>
+</div>
+<div class="status {{ 'good' if chain_valid else 'bad' }}">
+  <strong>Blockchain integrity: {{ 'VALID' if chain_valid else 'INVALID' }}</strong>
+  <span>{{ verify_message }}</span>
+  <a href="{{ url_for('verify_endpoint') }}">View verification JSON</a>
+</div>
+<section class="panel">
+  <h2>Feedback by category</h2>
+  {% if category_counts %}
+  <div class="category-list">
+    {% for row in category_counts %}
+      <div class="category-row"><span>{{ row.category }}</span><strong>{{ row.total }}</strong></div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="muted">No feedback has been submitted.</p>
+  {% endif %}
+</section>
+<section class="panel">
+  <h2>All feedback</h2>
+  <p><a href="{{ url_for('export_csv') }}">Download CSV report</a> · <a href="{{ url_for('audit_log') }}">View security audit events</a></p>
+  {% if feedback_rows %}
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Category</th><th>Rating</th><th>Comments</th><th>Submitted (UTC)</th><th>Block</th><th>Block hash</th></tr></thead>
+      <tbody>
+      {% for item in feedback_rows %}
+        <tr>
+          <td>{{ item.category }}</td>
+          <td>{{ item.rating }}/5</td>
+          <td class="comment-cell">{{ item.comments }}</td>
+          <td>{{ item.created_at }}</td>
+          <td>#{{ item.block_index }}</td>
+          <td><code class="hash">{{ item.block_hash }}</code></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">No feedback has been submitted.</p>
+  {% endif %}
+</section>
+{% endblock %}

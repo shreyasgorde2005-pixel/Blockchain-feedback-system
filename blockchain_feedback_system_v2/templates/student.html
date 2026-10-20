@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Student dashboard · Blockchain Feedback{% endblock %}
+{% block content %}
+<div class="page-heading">
+  <h1>Student dashboard</h1>
+  <p>Submit feedback and review your own submissions.</p>
+</div>
+<div class="status {{ 'good' if chain_valid else 'bad' }}">
+  <strong>Blockchain integrity: {{ 'VALID' if chain_valid else 'INVALID' }}</strong>
+  <span>{{ verify_message }}</span>
+</div>
+<section class="panel">
+  <h2>Submit feedback</h2>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="category">Feedback category</label>
+    <select id="category" name="category" required>
+      <option value="">Select category</option>
+      <option>Teaching</option>
+      <option>Course / Subject</option>
+      <option>College Facilities</option>
+      <option>Library</option>
+      <option>Other</option>
+    </select>
+    <label for="rating">Rating</label>
+    <select id="rating" name="rating" required>
+      <option value="">Select rating</option>
+      <option value="1">1 - Poor</option>
+      <option value="2">2 - Fair</option>
+      <option value="3">3 - Good</option>
+      <option value="4">4 - Very good</option>
+      <option value="5">5 - Excellent</option>
+    </select>
+    <label for="comments">Comments</label>
+    <textarea id="comments" name="comments" rows="4" maxlength="2000" required></textarea>
+    <button type="submit">Submit feedback</button>
+  </form>
+</section>
+<section class="panel">
+  <h2>My feedback history</h2>
+  {% if feedback_rows %}
+    {% for item in feedback_rows %}
+    <article class="feedback-entry">
+      <div class="entry-title"><strong>{{ item.category }}</strong><span class="rating">{{ item.rating }}/5</span></div>
+      <p class="feedback-comment">{{ item.comments }}</p>
+      <p class="muted">Submitted: {{ item.created_at }}</p>
+      <p class="muted">Block #{{ item.block_index }} · Hash</p>
+      <code class="hash">{{ item.block_hash }}</code>
+      <p><a href="{{ url_for('verify_proof', block_index=item.block_index) }}">Verify Merkle inclusion proof</a></p>
+    </article>
+    {% endfor %}
+  {% else %}
+    <p class="muted">You have not submitted feedback yet.</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Security audit · Blockchain Feedback{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Security audit events</h1>
+  <p class="muted">Recent account security events. Passwords and session tokens are never recorded.</p>
+  {% if audit_rows %}<div class="table-wrap"><table>
+    <thead><tr><th>Event</th><th>Account</th><th>Time (UTC)</th></tr></thead>
+    <tbody>{% for row in audit_rows %}<tr><td>{{ row.event_type }}</td><td>{{ row.username or 'Unavailable' }}</td><td>{{ row.created_at }}</td></tr>{% endfor %}</tbody>
+  </table></div>{% else %}<p class="muted">No security events recorded yet.</p>{% endif %}
+</section>
+{% endblock %}
